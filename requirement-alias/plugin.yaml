@@ -1,0 +1,7 @@
+name: "requirement-alias"
+version: "0.1.0"
+usage: "Provides script for handling aliases in requirements specification."
+description: |-
+  This plugin provides support for 'alias' key in requirements.yaml file.
+  See example chart: requirement-alias-test
+command: "$HELM_PLUGIN_DIR/requirement-alias.sh"

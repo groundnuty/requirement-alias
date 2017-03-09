@@ -1,0 +1,17 @@
+dependencies:
+  # No alias, dependency processed normally
+- name: redis
+  version: 0.4.6
+  repository: https://kubernetes-charts.storage.googleapis.com
+
+  # Dependency will be renamed to match the alias
+- name: redis
+  alias: redis-1
+  version: 0.4.6
+  repository: https://kubernetes-charts.storage.googleapis.com
+
+  # Different aliases can have different versions
+- name: redis
+  alias: redis-2
+  version: 0.4.5
+  repository: https://kubernetes-charts.storage.googleapis.com

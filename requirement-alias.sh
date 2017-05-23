@@ -5,7 +5,7 @@ cat << EOF
 Alias support for requirements.yaml
 
 Available Commands:
-  generate populates charts/ directory with aliassed charts 
+  generate populates charts/ directory with aliassed charts
 
 Aliases:
   generate, gen
@@ -47,10 +47,12 @@ generate() {
   chart="$1"
   charts="$1/charts"
 
+  rm -rf "$charts"/*
+
   helm dep update "$chart"
   helm dep build "$chart"
 
-  rm -rf "$charts"/*
+  #rm -rf "$charts"/*
   ls -l "${charts:?}/"
   for (( i=0; ; i++ ))
   do
@@ -61,28 +63,27 @@ generate() {
     req_alias=$(echo "$req" | sed -nr 's/\s*alias:\s+(\w+)/\1/p')
     req_name=$(echo "$req" | sed -nr 's/\s*name:\s+(\w+)/\1/p')
     req_version=$(echo "$req" | sed -nr 's/\s*version:\s+(\w+)/\1/p')
-    req_repository=$(echo "$req" | sed -nr 's/\s*repository:\s+(\w+)/\1/p')
-    repo_alias=$(helm repo list | sed -nr "s@(\S+)\s+($req_repository).*@\1@p")
+    #req_repository=$(echo "$req" | sed -nr 's/\s*repository:\s+(\w+)/\1/p')
+    #repo_alias=$(helm repo list | sed -nr "s@(\S+)\s+($req_repository).*@\1@p")
 
-    # echo alias=$req_alias
-    # echo name=$req_name
-    # echo version=$req_version
-    # echo repository=$req_repository
-    # echo repository alias repo_alias
+    echo alias=$req_alias
+    echo name=$req_name
+    echo version=$req_version
+    #echo repository=$req_repository
+    #echo repository_alias=$repo_alias
 
     if [[ "$req_alias" == "" ]] ; then
-      req_alias="$req_name"
+      continue
     fi
-    req_tar_name="$req_alias-$req_version"
 
-    helm fetch --version "$req_version" --untar -d "$charts" "$repo_alias/$req_name"
+    req_tar_name="$req_name-$req_version"
 
-    if [[ ! "$req_alias" == "$req_name" ]] ; then
-      mv "$charts/$req_name" "$charts/$req_alias"
-    fi
-    
-    sed -r -i "s@(^name:\s+)($req_name)\S*@\1$req_alias@g" "$charts/$req_alias/Chart.yaml" 
-    tar -C "$charts" -czf "$charts/$req_tar_name.tgz" "$req_alias"
+    tar -C "$charts" -xvzf "$charts/${req_tar_name}.tgz"
+
+    mv "$charts/$req_name" "$charts/$req_alias"
+
+    sed -r -i "s@(^name:\s+)($req_name)\S*@\1$req_alias@g" "$charts/$req_alias/Chart.yaml"
+    tar -C "$charts" -czf "$charts/$req_alias-$req_version.tgz" "$req_alias"
 
     echo "Created $charts/$req_tar_name.tgz"
 
